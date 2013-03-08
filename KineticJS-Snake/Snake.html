@@ -1,0 +1,387 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-UK">
+	<head>
+		<title>Kinetic JS Snake</title>
+		
+		<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+		<meta content="utf-8" http-equiv="encoding">
+		
+		<!-- Style items -->
+		<style>
+			body
+			{
+				background-color:#b0c4de;
+				margin: 0px;
+        		padding: 0px;
+			}
+			
+			#container {
+		        background-color: #FFF;
+		        display: inline-block;
+		        width: 300px;
+		        height: 300px;
+		        border-style:solid;
+				border-width:10px;
+			}
+			
+			#newGameContainer 
+			{
+			    text-align: center;
+			    width: 320px;
+			}
+		</style>
+		
+		<!-- Include script files -->
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+		<script type="text/javascript" src="scripts/kinetic-v4.0.1.min.js"></script>
+		<script type="text/javascript">
+			// Global variables
+			var snakeLength = 4;
+			var snakeShowing = 1;
+			var snakeSpeed = 100;
+			var snakeDirection = "R";
+			var snakeHeadLocationX = 10;
+			var snakeHeadLocationY = 10;
+			var snakeLowCount = 1;
+			var snakeTotCount = 1;
+			var snakeElementSize = 10;
+			var snakeFoodLocX = 0;
+			var snakeFoodLocY = 0;
+			var snakeScore = 0;
+			var deaded = false;
+			var layer;
+			var scoringLayer;
+			var stage;
+			var scoreText;
+			var highScore = 0;
+			var highlightText;
+			var grid = [];
+		
+			// Stop the arrow keys moving the page around
+			$(document).keydown(function(e) {
+				// Prevent the default thing happening when the key is pressed
+				e.preventDefault();
+				
+				// Find which code it is.
+				var code = (e.keyCode ? e.keyCode : e.which);
+				
+				// Check the different code and update the directions
+			  	if (code=="40")
+			  	{
+			  		// Down...
+			  		snakeDirection = "D";
+			  	} else if (code=="39") {
+			  		// Right
+			  		snakeDirection = "R";
+			  	} else if (code=="38") {
+			  		// Up
+			  		snakeDirection = "U";
+			  	} else if (code=="37") {
+			  		// Left
+			  		snakeDirection = "L";
+			  	}
+			});
+		
+			// On the start of the page, run this..
+			$(document).ready(function() {
+				// Create the stage
+			    stage = new Kinetic.Stage({
+			        container: 'container',
+			        width: 300,
+			        height: 300
+			    });
+		
+				// Now add a new layer
+		      	layer = new Kinetic.Layer();
+		      	
+		      	// Now add the scoring layer
+		      	scoringLayer = new Kinetic.Layer();
+		      	
+		      	// Create some text
+		      	scoreText = new Kinetic.Text({
+			        x: 10,
+			        y: 10,
+			        text: 'Press "New Game" to start a new game\n\nUse the arrow keys to control the snake.',
+			        fontSize: 10,
+			        fontFamily: 'Calibri',
+			        textFill: 'green'
+			    });
+		      	scoringLayer.add(scoreText);
+		      	
+		      	// Create some text
+		      	highlightText = new Kinetic.Text({
+			        x: 0,
+			        y: 100,
+			        width: 300,
+			        text: '',
+			        fontSize: 20,
+			        fontFamily: 'Calibri',
+			        textFill: 'red',
+			        align: 'center'
+			    });
+		      	scoringLayer.add(highlightText);
+		      	
+		      	// add the layer to the stage
+		      	stage.add(layer);
+		      	stage.add(scoringLayer);
+		      	
+		      	// New Game
+		      	//NewGame();
+			});
+			
+			// Game functions
+			// Create a new game
+			function NewGame()
+			{
+				// Remove any existing blocks 
+				if (snakeLowCount!=snakeTotCount)
+				{
+					for (var i=snakeLowCount;i<=snakeTotCount;i++)
+					{ 
+						SnakeRemovePiece(i);
+					}
+					
+					layer.remove(layer.get(".SnakeFood")[0]);
+		      		layer.draw();
+				}
+				
+				// Set up everything
+				grid = [];
+				snakeLength = 5;
+				snakeShowing = 1;
+				snakeSpeed = 100;
+				snakeDirection = "R";
+				snakeLowCount = 1;
+				snakeScore = 0;
+		      	scoreText.setText("Score : 0"); 
+		      	deaded = false;
+		      	snakeHeadLocationX = 10;
+				snakeHeadLocationY = 10;
+				snakeTotCount = 1;
+				snakeLowCount = 1;
+				snakeSpeed = 100;
+				
+				// Reset the death message
+				highlightText.setText("");
+				scoringLayer.draw();
+				
+				// Add the first block
+				AddBlock();
+				
+				// Start the game
+				StartGame();
+			}
+			
+			// Add a block to the screen
+			function AddBlock()
+			{
+				// Create the name item
+				var newItemName = "Snake" + snakeTotCount;
+				
+				// Create a new group
+				var newGroup = new Kinetic.Group({
+					id: newItemName,
+					name: newItemName,
+					x: snakeHeadLocationX,
+			        y: snakeHeadLocationY,
+			        width: 10,
+			        height: 10
+				});
+				
+				// Create the first block
+				var rect = new Kinetic.Rect({
+			        width: 10,
+			        height: 10,
+			        fill: 'black'
+			      });
+				
+				newGroup.add(rect);
+				
+				// Add the snake item to the grid
+				grid["LOC" + snakeHeadLocationX + "," + snakeHeadLocationY] = true;
+				
+				// Add the block and draw it as well.
+				layer.add(newGroup);
+		      	layer.draw();
+		      	
+		      	return newGroup;
+			}
+			
+			// Start the game
+			function StartGame()
+			{
+				// Start the game after three seconds
+				
+		      	// Generate new snake food.
+		      	SnakeFood();
+				
+				// Now start the moving
+				SnakeMove();
+				
+				// Draw the scoring layer
+				scoringLayer.draw();
+			}
+			
+			// Move the snake
+			function SnakeMove()
+			{
+				// Variables for use in the snake move function
+				var newHeadX = snakeHeadLocationX;
+				var newHeadY = snakeHeadLocationY;
+				
+				// New X and Y position
+				if (snakeDirection == "R")
+				{
+					newHeadX = snakeHeadLocationX + 10;	
+				} else if (snakeDirection == "L") {
+					newHeadX = snakeHeadLocationX - 10;
+				} else if (snakeDirection == "U") {
+					newHeadY = snakeHeadLocationY - 10;
+				} else {
+					newHeadY = snakeHeadLocationY + 10;
+				};
+	
+				// Set the size to be longer
+				snakeShowing++;
+				snakeTotCount++;
+	
+				// Check whether it is colliding
+				SnakeCheckNoCollide(newSnakeElement,newHeadX,newHeadY);
+	
+				// Check whether the snake is still alive.
+				if (!deaded)
+				{
+					// Set the new head location
+					snakeHeadLocationX = newHeadX;
+					snakeHeadLocationY = newHeadY;
+					
+					// Add the first block
+					var newSnakeElement = AddBlock();
+				
+					// Now set the count down for the piece removal
+					if (snakeShowing == snakeLength)
+					{
+						SnakeRemovePiece(snakeLowCount);	
+					};
+				
+					// Let the snake eat
+					SnakeEat();
+				
+					// Set this to make this work next time.
+					setTimeout("SnakeMove();",snakeSpeed);
+				};
+			}
+			
+			// Generate some new snake food
+			function SnakeFood()
+			{
+				// Generate a new X and Y coord
+				snakeFoodLocX = (Math.floor(Math.random()*28)*10) + 10;
+				snakeFoodLocY = (Math.floor(Math.random()*29)*10) + 10;
+				
+				// New Group
+				var newGroup = new Kinetic.Group({
+					id: "SnakeFood",
+					name: "SnakeFood"
+				});
+				
+				// Create the food block
+				var rect = new Kinetic.Rect({
+		        	x: snakeFoodLocX,
+			        y: snakeFoodLocY,
+			        width: 10,
+			        height: 10,
+			        fill: 'black'
+			      });
+				newGroup.add(rect);
+				
+				// Add the block and draw it as well.
+				layer.add(newGroup);
+		      	layer.draw();
+			}
+			
+			// Snake Food Location
+			function SnakeEat()
+			{
+				// Check whether the snake head and the food are in the same place
+				if ((snakeHeadLocationX==snakeFoodLocX)&&(snakeHeadLocationY==snakeFoodLocY))
+				{
+					// Increase the size of the snake by one
+					snakeLength++;
+					
+					// Remove the existing snake food
+					layer.remove(layer.get(".SnakeFood")[0]);
+		      		layer.draw();
+					
+					// Update the score
+					snakeScore+=10;
+					
+					// Make this faster
+					if (snakeSpeed>10)
+					{
+						snakeSpeed-=4;	
+					}
+					
+					// Now change the text.
+		      		scoreText.setText("Score : " + snakeScore); 
+		      		scoringLayer.draw();
+					
+					// Generate a bit more food
+		      		SnakeFood();
+				}
+			}
+			
+			// Remove a snake piece after a timeout
+			function SnakeRemovePiece(PieceID)
+			{	
+				// Create the name item
+				var itemName = ".Snake" + PieceID;
+				
+				// Advance the snake low count along
+				snakeLowCount++;
+				
+				// Update the amount showing and remove an item
+				snakeShowing--;
+				
+				// Get the shape from the layer
+				var shape = layer.get(itemName)[0];
+				
+				if (shape!=undefined)
+				{
+					// Set the grid location to false
+					grid["LOC" + shape.getX() + "," + shape.getY()] = false;
+					
+					// Remove a block and refresh the layer.
+					layer.remove(shape);
+			      	layer.draw();
+		     	}
+			}
+			
+			// Check whether the snake collides with the wall..
+			// .. or itself.
+			function SnakeCheckNoCollide(newSnakeElement,snakeHeadLocationNewX,snakeHeadLocationNewY)
+			{
+				// Check if the snake has collided with the border.
+				if (((snakeHeadLocationNewX>290) || (snakeHeadLocationNewX<=-10)) || ((snakeHeadLocationNewY>290) ||(snakeHeadLocationNewY<=-10)))
+				{
+					deaded = true; 
+				} else if (grid["LOC" + snakeHeadLocationNewX + "," + snakeHeadLocationNewY]) {
+					deaded = true; 
+				};
+				
+				// if the 
+				if (deaded)
+				{
+					highlightText.setText("Perrriill, Deaattthhhh!\nGAME OVER");
+					scoringLayer.draw();
+				};
+			}
+	    </script>
+	</head>
+	<body>
+		<div id="container"><!--none--></div>
+		<div id="newGameContainer">
+			<input type="button" value="New Game" onclick="deaded=true;NewGame();"/>
+		</div>
+	</body>
+</html>

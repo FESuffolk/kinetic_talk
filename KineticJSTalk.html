@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>reveal.js - The HTML Presentation Framework</title>
+
+		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+		<meta name="author" content="Hakim El Hattab">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="stylesheet" href="css/reveal.min.css">
+		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+
+		<!-- For syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- If the query includes 'print-pdf', use the PDF print sheet -->
+		<script>
+			document.write( '<link rel="stylesheet" href="css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+		</script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+
+				<section>
+					<h1>Kinetic.js</h1>
+					<h3>A Kinetic Canvas</h3>
+					<p>
+						<small>Presented by Paul Hutson</small>
+					</p>
+				</section>
+
+				<section>
+                    <section>
+					    <h2>First... the HTML5 Canvas</h2>
+					    <br />
+                        <ul>
+                            <li>The canvas tag is "New" with HTML5<br /><br /></li>
+                            <li>It enables us to dynamically generate interactive images in the browser<br /><br /></li>
+                            <li>It works across most modern devices and browsers - for instance, Safari on the iPhone<br /><br /></li>
+                        </ul>
+                        <p><i>You could say it's like Flash... <br /> ...but without having to download any plugins.</i></p>
+                    </section>
+
+                    <section>
+						<h2>Enter Kinetic</h2>
+                        <br />
+						<ul>
+                            <li>An API used to create images on the screen.<br /><br /></li>
+                            <li>JavaScript based (as all Canvas creation is) - meaning it should be familiar to you all and easy to pick up.<br /><br /></li>
+                        </ul>
+					</section>
+
+				</section>
+
+				<!-- Page 3 -->
+				<section>
+
+					<section>
+					    <h2>How Kinetic Works</h2>
+					    <br />
+                        
+                        <p>Kinetic is applied to a div container within the body of the HTML page to create a "Stage" for the rest of your image.<br /><br /></p>
+
+                        <pre><code contenteditable>
+
+                    var stage = new Kinetic.Stage({
+                        container: 'containerdiv',
+                        width: 578,
+                        height: 200
+                    });
+
+					    </code></pre>
+
+					</section>
+
+					<section>
+						<h2>Layers</h2>
+
+						<p>On top of the stage you can use layers where objects are stored<br /><br /></p>
+
+                        <pre><code contenteditable>
+
+                    var layer = new Kinetic.Layer();
+
+                    stage.add(layer);
+
+					    </code></pre>
+					</section>
+					
+				</section>
+
+				<section>
+					<h2>Kinetic Objects</h2><br />
+					<p>
+						There are loads of different predifined types<br /> of objects (circles, lines, rectangles, text, etc).<br /><br />
+					</p>
+
+                    <p>
+						You can also images and sprites that can<br />be used to create more complex applications.<br /><br />
+					</p>
+                    
+                    <p>
+						In addition to the above you are able to<br />create custom shapes using coordinates.<br /><br />
+					</p>
+				</section>
+
+				<section>
+					<h2>Groups</h2><br />
+
+					<p>
+					    "Groups" are able to contain one or more objects on the screen.  <br /><br />
+                    </p>
+
+                    <p>
+                        They allow you to easily manipulate the objects with a single<br />
+                        call (i.e. animate, fade out, remove/destroy).
+                    </p>
+				</section>
+
+				<section>
+                    <section>
+					    <h2>Moving Pictures</h2><br />
+
+					    <p>
+						    There are two different ways of<br />moving things within the Canvas<br /><br />
+					    </p>
+
+                        <p>
+                                Transitions & Animations
+                        </p>    
+                                
+                    </section>
+                    <section>
+                        <h2>Transitions</h2><br />
+
+                        <p>
+                            This is the easiest way to move objects or groups around around the stage...<br /><br />
+
+                            <pre><code contenteditable>
+
+                            shape.transitionTo({
+                              x: 100,
+                              y: 100,
+                              duration: 1
+                            });
+
+					        </code></pre><br /><br />
+
+                        </p>
+
+                        <p class="fragment">
+                            For reference, this is also how you fade things in and out as well by changing the opacity of the filter.<br /><br />
+                        </p>
+                        
+                    </section>
+                    <section>
+                        <h2>Animations</h2><br />
+
+                        <p>
+                            More complicated, but can be used to create custom animations.<br /><br />
+
+                            <pre><code contenteditable>
+
+                var anim = new Kinetic.Animation(function(frame) {
+                    var time = frame.time,
+                        timeDiff = frame.timeDiff,
+                        frameRate = frame.frameRate;
+
+                    // update stuff
+                }, layer);
+
+                anim.start();
+
+					        </code></pre>
+                        </p>
+                    </section>
+				</section>
+
+				<section>
+                    <section>
+                        <h2>Events</h2><br />
+
+                        <p>
+                            The user can interact with the Canvas by using normal<br />JS style actions : Click, Touch, Hover, etc...<br /><br />
+
+                            <pre><code contenteditable>
+
+                        shape.on('click', function(evt){
+                            // do stuff
+                        });
+
+					        </code></pre>
+                        </p><br /><br />
+
+                        <p class="fragment">
+                            You can also use keys and controllers to interact with the canvas...
+                        </p>
+                    </section>
+
+				</section>
+
+				<section>
+                    <section>
+					    <h2>SNAKE! SNAKE!!</h2>
+					    
+                        <p>
+                            Creating the classic game "Snake" in Kinetic uses a number<br />of different elements from the Kinetic Framework.<br /><br />
+                        </p>
+                        <p>Page Outline:
+                            
+
+                            <pre><code contenteditable>
+&#060;body&#062; 
+	&#060;div id="container"&#062;&#060;!--none--&#062;&#060;/div&#062; 
+	&#060;div id="newGameContainer"&#062;
+		&#060;input type="button" value="New Game" onclick="deaded=true;NewGame();"/&#062;
+	&#060;/div&#062;
+&#060;/body&#062;
+                            </code></pre>
+                        </p>
+                    </section>
+                    <section>
+                        <h2>SNAKE! SNAKE!! - Pt2</h2>
+
+                        <p>Page Load:
+                            
+
+                            <pre><code contenteditable>
+// On the start of the page, run this..
+$(document).ready(function() {
+	// Create the stage
+	stage = new Kinetic.Stage({
+		    container: 'container',
+		    width: 300,
+		    height: 300
+	});
+		
+	// Now add a new layer
+	layer = new Kinetic.Layer();
+		      	
+	// Now add the scoring layer
+	scoringLayer = new Kinetic.Layer();
+		      	
+	// Create some text
+	scoreText = new Kinetic.Text({
+		    x: 10,
+		    y: 10,
+		    text: 'Press "New Game" to start a new game\n\nUse the arrow keys to control the snake.',
+		    fontSize: 10,
+		    fontFamily: 'Calibri',
+		    textFill: 'green'
+	});
+	scoringLayer.add(scoreText);
+		      	
+	// Create a text element ready for the death message
+	highlightText = new Kinetic.Text({
+		    x: 0,
+		    y: 100,
+		    width: 300,
+		    text: '',
+		    fontSize: 20,
+		    fontFamily: 'Calibri',
+		    textFill: 'red',
+		    align: 'center'
+	});
+	scoringLayer.add(highlightText);
+		      	
+	// add the layer to the stage
+	stage.add(layer);
+	stage.add(scoringLayer);
+});
+                            </code></pre>
+                        </p>
+                    </section>
+                    <section>
+                        <h2>SNAKE! SNAKE!! - Pt3</h2>
+
+                        <p>New Game:
+                            
+
+                            <pre><code contenteditable>
+// Game functions
+// Create a new game
+function NewGame()
+{
+	// Remove any existing blocks 
+	if (snakeLowCount!=snakeTotCount)
+	{
+		    for (var i=snakeLowCount;i&#060;=snakeTotCount;i++)
+		    { 
+			        SnakeRemovePiece(i);
+		    }
+					
+		    layer.remove(layer.get(".SnakeFood")[0]);
+		    layer.draw();
+	}
+				
+	// Set up everything
+	grid = [];
+	snakeLength = 5;
+	snakeShowing = 1;
+	snakeSpeed = 100;
+	snakeDirection = "R";
+	snakeLowCount = 1;
+	snakeScore = 0;
+	scoreText.setText("Score : 0"); 
+	deaded = false;
+	snakeHeadLocationX = 10;
+	snakeHeadLocationY = 10;
+	snakeTotCount = 1;
+	snakeLowCount = 1;
+	snakeSpeed = 100;
+				
+	// Reset the death message
+	highlightText.setText("");
+	scoringLayer.draw();
+				
+	// Add the first block
+	AddBlock();
+				
+	// Start the game
+	StartGame();
+};
+                            </code></pre>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>SNAKE! SNAKE!! - Pt4</h2>
+
+                        <p>Adding Blocks to the Canvas:
+                            
+
+                            <pre><code contenteditable>
+// Add a block to the screen
+function AddBlock()
+{
+	// Create the name item
+	var newItemName = "Snake" + snakeTotCount;
+				
+	// Create a new group
+	var newGroup = new Kinetic.Group({
+		    id: newItemName,
+		    name: newItemName,
+		    x: snakeHeadLocationX,
+		    y: snakeHeadLocationY,
+		    width: 10,
+		    height: 10
+	});
+				
+	// Create the first block
+	var rect = new Kinetic.Rect({
+		    width: 10,
+		    height: 10,
+		    fill: 'black'
+	});
+				
+	newGroup.add(rect);
+				
+	// Add the snake item to the grid
+	grid["LOC" + snakeHeadLocationX + "," + snakeHeadLocationY] = true;
+				
+	// Add the block and draw it as well.
+	layer.add(newGroup);
+	layer.draw();
+		      	
+	return newGroup;
+}
+                            </code></pre>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>SNAKE! SNAKE!! - Pt5</h2>
+
+                        <p>Starting and Moving:
+                            
+
+                            <pre><code contenteditable>
+// Start the game
+function StartGame()
+{
+	// Generate new snake food.
+	SnakeFood();
+				
+	// Now start the moving
+	SnakeMove();
+				
+	// Draw the scoring layer
+	scoringLayer.draw();
+}
+			
+// Move the snake
+function SnakeMove()
+{
+	// Variables for use in the snake move function
+	var newHeadX = snakeHeadLocationX;
+	var newHeadY = snakeHeadLocationY;
+				
+	// New X and Y position
+	if (snakeDirection == "R")
+	{
+		    newHeadX = snakeHeadLocationX + 10;	
+	} else if (snakeDirection == "L") {
+		    newHeadX = snakeHeadLocationX - 10;
+	} else if (snakeDirection == "U") {
+		    newHeadY = snakeHeadLocationY - 10;
+	} else {
+		    newHeadY = snakeHeadLocationY + 10;
+	};
+	
+	// Set the size to be longer
+	snakeShowing++;
+	snakeTotCount++;
+	
+	// Check whether it is colliding
+	SnakeCheckNoCollide(newSnakeElement,newHeadX,newHeadY);
+	
+	// Check whether the snake is still alive.
+	if (!deaded)
+	{
+		    // Set the new head location
+		    snakeHeadLocationX = newHeadX;
+		    snakeHeadLocationY = newHeadY;
+					
+		    // Add the first block
+		    var newSnakeElement = AddBlock();
+				
+		    // Now set the count down for the piece removal
+		    if (snakeShowing == snakeLength)
+		    {
+			        SnakeRemovePiece(snakeLowCount);	
+		    };
+				
+		    // Let the snake eat
+		    SnakeEat();
+				
+		    // Set this to make this work next time.
+		    setTimeout("SnakeMove();",snakeSpeed);
+	};
+}
+                            </code></pre>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>SNAKE! SNAKE!! - Pt6</h2>
+
+                        <p>Eating and Removing Pieces:
+                            
+
+                            <pre><code contenteditable>
+// Snake Food Location
+function SnakeEat()
+{
+	// Check whether the snake head and the food are in the same place
+	if ((snakeHeadLocationX==snakeFoodLocX)&&(snakeHeadLocationY==snakeFoodLocY))
+	{
+		    // Increase the size of the snake by one
+		    snakeLength++;
+					
+		    // Remove the existing snake food
+		    layer.remove(layer.get(".SnakeFood")[0]);
+		    layer.draw();
+					
+		    // Update the score
+		    snakeScore+=10;
+					
+		    // Make this faster
+		    if (snakeSpeed>10)
+		    {
+			        snakeSpeed-=4;	
+		    }
+					
+		    // Now change the text.
+		    scoreText.setText("Score : " + snakeScore); 
+		    scoringLayer.draw();
+					
+		    // Generate a bit more food
+		    SnakeFood();
+	}
+}
+			
+// Remove a snake piece after a timeout
+function SnakeRemovePiece(PieceID)
+{	
+	// Create the name item
+	var itemName = ".Snake" + PieceID;
+				
+	// Advance the snake low count along
+	snakeLowCount++;
+				
+	// Update the amount showing and remove an item
+	snakeShowing--;
+				
+	// Get the shape from the layer
+	var shape = layer.get(itemName)[0];
+				
+	if (shape!=undefined)
+	{
+		    // Set the grid location to false
+		    grid["LOC" + shape.getX() + "," + shape.getY()] = false;
+					
+		    // Remove a block and refresh the layer.
+		    layer.remove(shape);
+		    layer.draw();
+	}
+}
+                            </code></pre>
+                        </p>
+                    </section>
+
+                    <section>
+                        <h2>SNAKE! SNAKE!! - Pt7</h2>
+
+                        <p>Collision:
+                            
+
+                            <pre><code contenteditable>
+// Check whether the snake collides with the wall..
+// .. or itself.
+function SnakeCheckNoCollide(newSnakeElement,snakeHeadLocationNewX,snakeHeadLocationNewY)
+{
+	// Check if the snake has collided with the border.
+	if (((snakeHeadLocationNewX>290) || (snakeHeadLocationNewX<=-10)) || ((snakeHeadLocationNewY>290) ||(snakeHeadLocationNewY<=-10)))
+	{
+		    deaded = true; 
+	} else if (grid["LOC" + snakeHeadLocationNewX + "," + snakeHeadLocationNewY]) {
+		    deaded = true; 
+	};
+				
+	// if the snake has hit something (i.e. died) display the /death message/
+	if (deaded)
+	{
+		    highlightText.setText("Perrriill, Deaattthhhh!\nGAME OVER");
+		    scoringLayer.draw();
+	};
+}
+                            </code></pre>
+                        </p>
+                    </section>
+
+                    
+                    <section>
+                        <h2>SNAKE! SNAKE!! - Pt8</h2>
+
+                        <p>
+                            <br />
+
+                            Gametime:<br /><br />
+
+                            <iframe height="350" width="320" src="kineticJS-Snake/snake.html"></iframe> 
+                        </p>
+                    </section>
+				</section>
+
+                <section>
+					<h2>Questions?</h2>
+				</section>
+
+				<section>
+					<h1>THE END</h1>
+				</section>
+
+			</div>
+
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.min.js"></script>
+
+		<script>
+
+			// Full list of configuration options available here:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/showdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+					// { src: 'plugin/remotes/remotes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+			});
+
+		</script>
+
+	</body>
+</html>
